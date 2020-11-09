@@ -11,67 +11,66 @@ import (
 	"net/url"
 	"os"
 	"strconv"
-	"time"
 )
 
 var tpl = template.Must(template.ParseFiles("index.html"))
 var apiKey *string
 
-type Source struct {
-	ID   interface{} `json:"id"`
-	Name string      `json:"name"`
-}
+// type Source struct {
+// 	ID   interface{} `json:"id"`
+// 	Name string      `json:"name"`
+// }
 
-type Article struct {
-	Source      Source    `json:"source"`
-	Author      string    `json:"author"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	URL         string    `json:"url"`
-	URLToImage  string    `json:"urlToImage"`
-	PublishedAt time.Time `json:"publishedAt"`
-	Content     string    `json:"content"`
-}
+// type Article struct {
+// 	Source      Source    `json:"source"`
+// 	Author      string    `json:"author"`
+// 	Title       string    `json:"title"`
+// 	Description string    `json:"description"`
+// 	URL         string    `json:"url"`
+// 	URLToImage  string    `json:"urlToImage"`
+// 	PublishedAt time.Time `json:"publishedAt"`
+// 	Content     string    `json:"content"`
+// }
 
-func (a *Article) FormatPublishedDate() string {
-	year, month, day := a.PublishedAt.Date()
-	return fmt.Sprintf("%v %d, %d", month, day, year)
-}
+// func (a *Article) FormatPublishedDate() string {
+// 	year, month, day := a.PublishedAt.Date()
+// 	return fmt.Sprintf("%v %d, %d", month, day, year)
+// }
 
-type Results struct {
-	Status       string    `json:"status"`
-	TotalResults int       `json:"totalResults"`
-	Articles     []Article `json:"articles"`
-}
+// type Results struct {
+// 	Status       string    `json:"status"`
+// 	TotalResults int       `json:"totalResults"`
+// 	Articles     []Article `json:"articles"`
+// }
 
-type Search struct {
-	SearchKey  string
-	NextPage   int
-	TotalPages int
-	Results    Results
-}
+// type Search struct {
+// 	SearchKey  string
+// 	NextPage   int
+// 	TotalPages int
+// 	Results    Results
+// }
 
-func (s *Search) IsLastPage() bool {
-	return s.NextPage >= s.TotalPages
-}
+// func (s *Search) IsLastPage() bool {
+// 	return s.NextPage >= s.TotalPages
+// }
 
-func (s *Search) PreviousPage() int {
-	return s.CurrentPage() - 1
-}
+// func (s *Search) PreviousPage() int {
+// 	return s.CurrentPage() - 1
+// }
 
-func (s *Search) CurrentPage() int {
-	if s.NextPage == 1 {
-		return s.NextPage
-	}
+// func (s *Search) CurrentPage() int {
+// 	if s.NextPage == 1 {
+// 		return s.NextPage
+// 	}
 
-	return s.NextPage - 1
-}
+// 	return s.NextPage - 1
+// }
 
-type NewsAPIError struct {
-	Status  string `json:"status"`
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
+// type NewsAPIError struct {
+// 	Status  string `json:"status"`
+// 	Code    string `json:"code"`
+// 	Message string `json:"message"`
+// }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tpl.Execute(w, nil)
@@ -103,8 +102,8 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	search.NextPage = next
 	pageSize := 20
-
-	endpoint := fmt.Sprintf("https://newsapi.org/v2/everything?q=%s&pageSize=%d&page=%d&apiKey=%s&sortBy=publishedAt&language=en", url.QueryEscape(search.SearchKey), pageSize, search.NextPage, *apiKey)
+	endpoint := fmt.Sprintf("https://newsapi.org/v2/top-headlines?apiKey=4dcec0e99dcf47ddb145f166f4764d03&sortBy=publishedAt&language=en")
+	// endpoint := fmt.Sprintf("https://newsapi.org/v2/top-headlines?q=%s&pageSize=%d&page=%d&apiKey=%s&sortBy=publishedAt&language=en&country=cn", url.QueryEscape(search.SearchKey), pageSize, search.NextPage, *apiKey)
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -152,9 +151,9 @@ func main() {
 	apiKey = flag.String("apikey", "", "Newsapi.org access key")
 	flag.Parse()
 
-	if *apiKey == "" {
-		log.Fatal("apiKey must be set")
-	}
+	// if *apiKey == "" {
+	// 	log.Fatal("apiKey must be set")
+	// }
 
 	mux := http.NewServeMux()
 
